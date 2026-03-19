@@ -1,0 +1,15 @@
+[project]
+name = "vpws-huawei"
+version = "0.1.0"
+description = "VPWS automation script for Huawei VRP devices"
+requires-python = ">=3.8"
+dependencies = [
+    "netmiko>=4.3.0",
+]
+
+[project.scripts]
+vpws = "vpws_huawei:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
