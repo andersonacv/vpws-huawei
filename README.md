@@ -4,7 +4,6 @@ Script Python para automatizar a criação de circuitos VPWS (Virtual Private Wi
 
 ## Funcionalidades
 
-- Suporte a múltiplos equipamentos PE em uma única execução
 - Verificação de disponibilidade da VLAN antes de criar
 - Listagem das interfaces disponíveis com status
 - Detecção automática do tipo de interface (**trunk**, **hybrid** ou **access**)
