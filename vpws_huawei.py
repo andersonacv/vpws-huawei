@@ -162,6 +162,29 @@ _IFACE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# Abbreviated names shown by VRP → full names required in config commands
+_IFACE_EXPAND = {
+    "GE":   "GigabitEthernet",
+    "XGE":  "XGigabitEthernet",
+    "10GE": "10GigabitEthernet",
+    "40GE": "40GigabitEthernet",
+    "100GE": "100GigabitEthernet",
+}
+
+_IFACE_ABBREV_RE = re.compile(
+    r"^(GE|XGE|10GE|40GE|100GE)(\d.*)", re.IGNORECASE
+)
+
+
+def expand_iface_name(name: str) -> str:
+    """Expands abbreviated Huawei interface names to their full form."""
+    m = _IFACE_ABBREV_RE.match(name)
+    if m:
+        abbrev = m.group(1).upper()
+        rest   = m.group(2)
+        return _IFACE_EXPAND.get(abbrev, abbrev) + rest
+    return name
+
 
 def list_interfaces(conn) -> list:
     output = conn.send_command("display interface description")
@@ -181,7 +204,8 @@ def list_interfaces(conn) -> list:
             desc     = m.group(4).strip()
             # Skip sub-interfaces and management (MEth)
             if "." not in iface and "MEth" not in iface:
-                interfaces.append(iface)
+                full_name = expand_iface_name(iface)
+                interfaces.append(full_name)
                 print(f"  {idx:<4} {iface:<28} {physical:<7} {protocol:<7} {desc}")
                 idx += 1
 
@@ -200,8 +224,9 @@ def select_interface(interfaces: list) -> str:
         except ValueError:
             # Accept manually typed interface name
             if entry:
-                warning(f"Using manually typed interface: {entry}")
-                return entry
+                full = expand_iface_name(entry)
+                warning(f"Using manually typed interface: {full}")
+                return full
             error("Enter a number or interface name.")
 
 
